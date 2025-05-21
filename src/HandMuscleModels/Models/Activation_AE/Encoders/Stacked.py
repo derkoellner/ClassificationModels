@@ -1,5 +1,5 @@
 import torch.nn as nn
-from Helper_Modules import BaseStackedAutoEncoder
+from ..Helper_Modules import BaseStackedAutoEncoder
 
 class StackedEncoder(BaseStackedAutoEncoder):
     def __init__(

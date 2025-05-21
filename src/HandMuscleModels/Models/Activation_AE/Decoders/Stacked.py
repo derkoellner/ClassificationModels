@@ -1,6 +1,6 @@
 import numpy as np
 import torch.nn as nn
-from Helper_Modules import BaseStackedAutoEncoder
+from ..Helper_Modules import BaseStackedAutoEncoder
 
 class StackedDecoder(BaseStackedAutoEncoder):
     def __init__(

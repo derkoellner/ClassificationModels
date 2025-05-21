@@ -1,5 +1,5 @@
 import torch.nn as nn
-from Helper_Modules import _ResidualBlock
+from ..Helper_Modules import _ResidualBlock
 
 import numpy as np
 
