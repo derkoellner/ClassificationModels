@@ -1,4 +1,4 @@
-from Models import (
+from ..Models import (
     # Ready to go models
     StackedAE,
     Combined_CNN,

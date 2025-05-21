@@ -1,4 +1,4 @@
-from loss_fns import (
+from ..loss_fns import (
     MSELoss,
     CorrelationLoss
 )

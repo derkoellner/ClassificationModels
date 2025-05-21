@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 
-from Encoders.Stacked import StackedEncoder
-from Decoders.Stacked import StackedDecoder
+from .Encoders.Stacked import StackedEncoder
+from .Decoders.Stacked import StackedDecoder
 
-from Encoders.CNN import CNN_Spec, CNN_Temp
-from Decoders.CNN import CNN_Parallel, CNN_Series
+from .Encoders.CNN import CNN_Spec, CNN_Temp
+# from .Decoders.CNN import CNN_Parallel, CNN_Series
     
 class StackedAE(nn.Module):
     def __init__(
@@ -41,8 +41,8 @@ class Combined_CNN(nn.Module):
                 n_channels: int,
                 n_temporal_filters: int = 40,
                 temporal_filter_length: float = 0.5,
-                dropout: float = 0.5,
-                parallel: bool = False):
+                dropout: float = 0.5):
+                # parallel: bool = False):
         super().__init__()
 
         self.spectral_encoder = CNN_Spec(spec_shape=spec_shape, t_samples=n_time_samples, n_channels=n_channels, n_temporal_filters=n_temporal_filters, temporal_filter_length=temporal_filter_length, dropout=dropout)
@@ -52,10 +52,10 @@ class Combined_CNN(nn.Module):
         self.nl = nn.ReLU()
         self.linear2 = nn.Linear(in_features=n_temporal_filters, out_features=2)
 
-        if parallel:
-            self.decoder = CNN_Parallel(n_time_samples=n_time_samples, n_channels=n_channels, dropout=dropout)
-        else:
-            self.decoder = CNN_Series(n_time_samples=n_time_samples, n_channels=n_channels, dropout=dropout)
+        # if parallel:
+        #     self.decoder = CNN_Parallel(n_time_samples=n_time_samples, n_channels=n_channels, dropout=dropout)
+        # else:
+        #     self.decoder = CNN_Series(n_time_samples=n_time_samples, n_channels=n_channels, dropout=dropout)
 
     def forward(self, x_f, x_t):
         x_f = self.spectral_encoder(x_f)
@@ -72,6 +72,6 @@ class Combined_CNN(nn.Module):
 
         x_hat = torch.permute(x_hat, dims=(0,2,1))
 
-        x = self.decoder(x_hat)
+        # x = self.decoder(x_hat)
 
-        return x
+        return x_hat

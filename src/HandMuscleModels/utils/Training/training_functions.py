@@ -1,7 +1,7 @@
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from utils.wandb_functions import log_model
+from ..wandb_functions import log_model
 from .basic_training_functions import train_test
 from .stacked_training_functions import train_SAE
 
