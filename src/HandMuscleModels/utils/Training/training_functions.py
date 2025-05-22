@@ -5,7 +5,7 @@ from ..wandb_functions import log_model
 from .basic_training_functions import train_test
 from .stacked_training_functions import train_SAE
 
-from Models.Activation_AE.ReadyToGoAEs import StackedAE
+from ...Models.Activation_AE.ReadyToGoAEs import StackedAE
 
 import wandb
 
