@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 
 import wandb
 
-from Models.Activation_AE.ReadyToGoAEs import StackedAE
+from ...Models.Activation_AE.ReadyToGoAEs import StackedAE
 
 def train_SAE(model: StackedAE,
           n_layers: int,
