@@ -18,15 +18,16 @@ def train_model(
                 device,
                 epochs: int,
                 model_name: str,
-                config: dict,
+                wandb_config: dict,
                 direct_decode: bool = True,
+                project='Activation_AE'
                 ):
 
     wandb.init(
-        project="AutoEncoder",
-        name='TCN_AE',
+        project=project,
+        name=model_name,
 
-        config=config
+        config=wandb_config
     )
 
     train_test(
@@ -52,23 +53,19 @@ def train_test_SAE(model: StackedAE,
           epochs: int,
           training_data: DataLoader,
           test_data: DataLoader,
-          lr: float,
           model_name: str,
           optimizer,
           signal_loss_fn,
           feat_loss_fn,
-          device):
+          device,
+          wandb_config,
+          project='Activation_AE'):
     
     wandb.init(
-        project="AutoEncoder",
+        project=project,
         name='StackedAE',
 
-        config={
-        "learning_rate": lr,
-        "architecture": 'StackedAE',
-        "epochs": epochs,
-        "loss-fn": "MSE"
-        }
+        config=wandb_config
     )
 
     train_SAE(
