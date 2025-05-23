@@ -20,7 +20,8 @@ def train_model(
                 model_name: str,
                 wandb_config: dict,
                 direct_decode: bool = True,
-                project='Activation_AE'
+                project='Activation_AE',
+                accum_steps: int = 1
                 ):
 
     wandb.init(
@@ -38,7 +39,8 @@ def train_model(
         optimizer=optimizer,
         loss_fn=loss_fn,
         device=device,
-        direct_decode=direct_decode
+        direct_decode=direct_decode,
+        accum_steps=accum_steps
     )
 
     log_model(
