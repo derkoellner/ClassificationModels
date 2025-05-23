@@ -9,8 +9,8 @@ class CorrelationLoss(nn.Module):
 
     def forward(self, pred, target):
         # CHANGED: per-sample flatten to preserve batch dimension
-        pred_flat = pred.view(pred.size(0), -1)  # shape (B, N)
-        target_flat = target.view(target.size(0), -1)  # shape (B, N)
+        pred_flat = pred.reshape(pred.size(0), -1)  # shape (B, N)
+        target_flat = target.reshape(target.size(0), -1)  # shape (B, N)
 
         N = pred_flat.size(1)  # number of elements per sample
 
