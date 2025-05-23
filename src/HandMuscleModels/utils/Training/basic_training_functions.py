@@ -126,7 +126,7 @@ def test(model,
                 signal, y = signal.to(device), y.to(device)
                 signal_hat = model(signal, y) # TODO remove y
 
-                loss = loss_fn(signal_hat, signal)
+                loss = loss_fn(signal_hat, y)
                 if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
                     loss = loss.mean()
                 test_loss += loss.item()

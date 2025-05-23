@@ -8,9 +8,16 @@ class CorrelationLoss(nn.Module):
         self.reduction = reduction  # CHANGED: store reduction method
 
     def forward(self, pred, target):
+
+        if pred.shape != target.shape:
+            raise ValueError(f"Shape mismatch: pred {pred.shape}, target {target.shape}")
+
+        B = pred.size(0)
+        N = pred[0].numel()
+
         # CHANGED: per-sample flatten to preserve batch dimension
-        pred_flat = pred.reshape(pred.size(0), -1)  # shape (B, N)
-        target_flat = target.reshape(target.size(0), -1)  # shape (B, N)
+        pred_flat = pred.reshape(B, -1)  # shape (B, N)
+        target_flat = target.reshape(B, -1)  # shape (B, N)
 
         N = pred_flat.size(1)  # number of elements per sample
 
