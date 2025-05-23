@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import wandb
-from tqdm import tqdm  # CHANGED: added tqdm for progress bars
+from tqdm import tqdm
 
 def train_test(
         model: nn.Module,
