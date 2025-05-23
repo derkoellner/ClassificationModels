@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import wandb
+from tqdm import tqdm  # CHANGED: added tqdm for progress bars
 
 def train_test(
         model: nn.Module,
@@ -12,7 +13,8 @@ def train_test(
         loss_fn,
         device,
         direct_decode: bool = True,
-        log: bool = True
+        log: bool = True,
+        accum_steps: int = 1
     ):
     
     for epoch in range(epochs):
@@ -20,9 +22,21 @@ def train_test(
         print(f"###########################\nEpoch {epoch + 1}/{epochs}\n---------------------------")
 
         model.train(True)
-        avg_train_loss = train(model, train_data, optimizer, loss_fn, device, direct_decode)
+        avg_train_loss = train(
+            model,
+            train_data,
+            optimizer,
+            loss_fn,
+            device,
+            direct_decode,
+            accum_steps)
         model.eval()
-        test_loss = test(model, test_data, device, loss_fn, direct_decode)
+        test_loss = test(
+            model,
+            test_data,
+            device,
+            loss_fn,
+            direct_decode)
         print(f"Train Loss: {avg_train_loss:.4f}\nTest Loss: {test_loss:>8f}")
 
         if log:
@@ -37,19 +51,20 @@ def train(
         optimizer,
         loss_fn,
         device,
-        direct_decode: bool = True
+        direct_decode: bool = True,
+        accum_steps: int = 1
     ):
 
     size = len(data.dataset)
     batch_size = data.batch_size
     running_loss = 0.0
 
-    for batch_idx, batch in enumerate(data):
+    optimizer.zero_grad()
+
+    for batch_idx, batch in enumerate(tqdm(data, desc="Training", unit="batch")):
         if direct_decode:
             signal = batch
             signal = signal.to(device)
-
-            optimizer.zero_grad()
 
             signal_hat = model(signal)
             loss = loss_fn(signal_hat, signal)
@@ -61,15 +76,25 @@ def train(
             signal_hat = model(signal, y) # TODO remove y
             loss = loss_fn(signal_hat, y)
 
+        if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
+            loss = loss.mean()
+
         current = (batch_idx + 1) * batch_size
         current = current if current <= size else size
 
-        print(f'loss: {loss.item():>7f} [{current:>5d}/{size:>5d}]')
-
+        loss = loss / accum_steps
         loss.backward()
-        optimizer.step()
 
-        running_loss += loss.item()
+        if (batch_idx + 1) % accum_steps == 0 or (batch_idx + 1) == len(data):
+            optimizer.step()
+            optimizer.zero_grad()
+
+        running_loss += loss.item() * accum_steps
+
+        if (batch_idx + 1) % (10 * accum_steps) == 0:
+            current = (batch_idx + 1) * batch_size
+            current = current if current <= size else size
+            tqdm.write(f'  [Batch {current}/{size}] loss: {running_loss / (batch_idx+1):.6f}')
 
     avg_loss = running_loss / len(data)
 
@@ -91,14 +116,20 @@ def test(model,
                 signal = signal.to(device)
                 signal_hat = model(signal)
 
-                test_loss += loss_fn(signal_hat, signal).item()
+                loss = loss_fn(signal_hat, signal)
+                if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
+                    loss = loss.mean()
+                test_loss += loss.item()
 
         else:
             for signal, y in data:
                 signal, y = signal.to(device), y.to(device)
                 signal_hat = model(signal, y) # TODO remove y
 
-                test_loss += loss_fn(signal_hat, y).item()
+                loss = loss_fn(signal_hat, signal)
+                if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
+                    loss = loss.mean()
+                test_loss += loss.item()
 
     test_loss /= num_batches
 

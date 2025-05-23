@@ -2,32 +2,50 @@ import torch
 import torch.nn as nn
 
 class CorrelationLoss(nn.Module):
-    def __init__(self, epsilon: float = 1e-8):
+    def __init__(self, epsilon: float = 1e-8, reduction: str = 'mean'):  # CHANGED: added reduction parameter
         super(CorrelationLoss, self).__init__()
         self.epsilon = epsilon
+        self.reduction = reduction  # CHANGED: store reduction method
 
     def forward(self, pred, target):
-        pred = torch.flatten(pred)
-        target = torch.flatten(target)
+        # CHANGED: per-sample flatten to preserve batch dimension
+        pred_flat = pred.view(pred.size(0), -1)  # shape (B, N)
+        target_flat = target.view(target.size(0), -1)  # shape (B, N)
 
-        N = len(target)
+        N = pred_flat.size(1)  # number of elements per sample
 
-        pred_mean = torch.mean(pred)
-        target_mean = torch.mean(target)
+        # compute per-sample means
+        pred_mean = pred_flat.mean(dim=1, keepdim=True)  # shape (B,1)
+        target_mean = target_flat.mean(dim=1, keepdim=True)  # shape (B,1)
 
-        pred_std = torch.std(pred) + self.epsilon
-        target_std = torch.std(target) + self.epsilon
+        # compute population variance
+        pred_var = torch.mean((pred_flat - pred_mean) ** 2, dim=1, keepdim=True) + self.epsilon  # shape (B,1)
+        target_var = torch.mean((target_flat - target_mean) ** 2, dim=1, keepdim=True) + self.epsilon  # shape (B,1)
 
-        pred_hat = (pred-pred_mean)/pred_std
-        target_hat = (target-target_mean)/target_std
+        # standard deviations
+        pred_std = torch.sqrt(pred_var)  # shape (B,1)
+        target_std = torch.sqrt(target_var)  # shape (B,1)
 
-        corr = torch.sum(pred_hat * target_hat)/(N-1)
+        # normalize
+        pred_hat = (pred_flat - pred_mean) / pred_std  # shape (B, N)
+        target_hat = (target_flat - target_mean) / target_std  # shape (B, N)
 
-        nom = 2 * corr * pred_std * target_std
-        den = torch.square(pred_std) + torch.square(target_std) + torch.square(pred_mean - target_mean) + self.epsilon
+        # compute population correlation per sample
+        corr = torch.sum(pred_hat * target_hat, dim=1, keepdim=True) / N  # shape (B,1)
 
-        ccc = nom/den
+        # concordance correlation coefficient components
+        nom = 2 * corr * pred_std * target_std  # shape (B,1)
+        den = pred_var + target_var + (pred_mean - target_mean) ** 2 + self.epsilon  # shape (B,1)
 
-        loss = 1-ccc
+        ccc = nom / den  # shape (B,1)
+        ccc = ccc.squeeze(1)  # CHANGED: shape (B,)
 
-        return loss
+        loss = 1 - ccc  # tensor of shape (B,)
+
+        # CHANGED: apply reduction
+        if self.reduction == 'sum':
+            return loss.sum()
+        elif self.reduction == 'none':
+            return loss
+        else:  # default 'mean'
+            return loss.mean()  # CHANGED
