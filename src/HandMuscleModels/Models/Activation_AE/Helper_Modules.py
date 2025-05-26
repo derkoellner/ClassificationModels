@@ -35,12 +35,11 @@ class BiasLayer(nn.Module):
 class BaseStackedAutoEncoder(nn.Module):
     def get_number_layers(self,
                           n_channels: int,
-                          n_joints: int,
+                          hidden_size: int,
                           decrease: int):
         
-        output_size = 2 * n_joints
-        n_layers = max(1, (n_channels - output_size + decrease - 1) // decrease + 1)
-        layer_inputs = np.maximum(n_channels - decrease * np.arange(n_layers), output_size)
+        n_layers = max(1, (n_channels - hidden_size + decrease - 1) // decrease + 1)
+        layer_inputs = np.maximum(n_channels - decrease * np.arange(n_layers), hidden_size)
         return n_layers, layer_inputs.astype(int)
     
     def get_activation_function(self,

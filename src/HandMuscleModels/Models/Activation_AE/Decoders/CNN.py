@@ -5,13 +5,14 @@ class CNN_Parallel(nn.Module):
     def __init__(self,
                  n_time_samples: int,
                  n_channels: int,
-                 dropout: float = 0.5):
+                 dropout: float = 0.5,
+                 hidden_size: int = 2):
         super().__init__()
 
         temporal_filter_length = int(n_time_samples * 0.1)
         temporal_filter_length = temporal_filter_length - 1 if temporal_filter_length % 2 == 0 else temporal_filter_length
 
-        self.deconv_channels = nn.ConvTranspose1d(2, n_channels,
+        self.deconv_channels = nn.ConvTranspose1d(hidden_size, n_channels,
                                                   kernel_size=1)
         self.bn1 = nn.BatchNorm1d(n_channels)
         self.conv_s_time = nn.Conv1d(n_channels, n_channels,
@@ -70,13 +71,14 @@ class CNN_Series(nn.Module):
     def __init__(self,
                  n_time_samples: int,
                  n_channels: int,
-                 dropout: float = 0.5):
+                 dropout: float = 0.5,
+                 hidden_size: int = 2):
         super().__init__()
 
         temporal_filter_length = int(n_time_samples * 0.1)
         temporal_filter_length = temporal_filter_length - 1 if temporal_filter_length % 2 == 0 else temporal_filter_length
 
-        self.deconv_channels = nn.ConvTranspose1d(2, n_channels,
+        self.deconv_channels = nn.ConvTranspose1d(hidden_size, n_channels,
                                                   kernel_size=1)
         self.bn1 = nn.BatchNorm1d(n_channels)
         self.conv_s_time = nn.Conv1d(n_channels, n_channels,

@@ -6,14 +6,14 @@ class StackedDecoder(BaseStackedAutoEncoder):
     def __init__(
             self,
             n_channels: int,
-            n_joints: int = 1,
+            hidden_size: int = 2,
             decrease: int = 1,
             bias: bool = True,
             activation_function: str = 'ReLU'):
         super().__init__()
         self.Decoder_Layers = nn.ModuleList()
         self.activation_function = self.get_activation_function(activation_function=activation_function)
-        n_layers, layer_inputs = self.get_number_layers(n_channels=n_channels, n_joints=n_joints, decrease=decrease)
+        n_layers, layer_inputs = self.get_number_layers(n_channels=n_channels, hidden_size=hidden_size, decrease=decrease)
         layer_inputs = np.flip(layer_inputs)
         for layer in range(n_layers-1):
             layer_input = layer_inputs[layer]

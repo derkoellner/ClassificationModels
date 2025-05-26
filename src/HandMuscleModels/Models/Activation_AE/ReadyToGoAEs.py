@@ -11,15 +11,15 @@ class StackedAE(nn.Module):
     def __init__(
             self,
             n_channels: int,
-            n_joints: int = 1,
+            hidden_size: int = 2,
             decrease: int = 1,
             bias: bool = True,
             activation_function: str = 'ReLU',
             output_activation_function: str = 'sigmoid'):
         super().__init__()
 
-        self.Encoder = StackedEncoder(n_channels=n_channels, n_joints=n_joints, decrease=decrease, bias=bias, activation_function=activation_function, output_activation_function=output_activation_function)
-        self.Decoder = StackedDecoder(n_channels=n_channels, n_joints=n_joints, decrease=decrease, bias=bias, activation_function=activation_function)
+        self.Encoder = StackedEncoder(n_channels=n_channels, hidden_size=hidden_size, decrease=decrease, bias=bias, activation_function=activation_function, output_activation_function=output_activation_function)
+        self.Decoder = StackedDecoder(n_channels=n_channels, hidden_size=hidden_size, decrease=decrease, bias=bias, activation_function=activation_function)
 
     def forward(self, x, training_iteration=0):
 
@@ -41,7 +41,8 @@ class Combined_CNN(nn.Module):
                 n_channels: int,
                 n_temporal_filters: int = 40,
                 temporal_filter_length: float = 0.5,
-                dropout: float = 0.5):
+                dropout: float = 0.5,
+                hidden_size: int = 2):
                 # parallel: bool = False):
         super().__init__()
 
@@ -50,7 +51,7 @@ class Combined_CNN(nn.Module):
 
         self.linear1 = nn.Linear(in_features=2*n_temporal_filters, out_features=n_temporal_filters)
         self.nl = nn.ReLU()
-        self.linear2 = nn.Linear(in_features=n_temporal_filters, out_features=2)
+        self.linear2 = nn.Linear(in_features=n_temporal_filters, out_features=hidden_size)
 
         # if parallel:
         #     self.decoder = CNN_Parallel(n_time_samples=n_time_samples, n_channels=n_channels, dropout=dropout)

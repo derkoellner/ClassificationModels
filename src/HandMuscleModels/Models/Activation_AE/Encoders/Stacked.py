@@ -5,7 +5,7 @@ class StackedEncoder(BaseStackedAutoEncoder):
     def __init__(
             self,
             n_channels: int,
-            n_joints: int = 1,
+            hidden_size: int = 2,
             decrease: int = 1,
             bias: bool = True,
             activation_function: str = 'ReLU',
@@ -14,7 +14,7 @@ class StackedEncoder(BaseStackedAutoEncoder):
         self.Encoder_Layers = nn.ModuleList()
         self.activation_function = self.get_activation_function(activation_function=activation_function)
         self.output_activation_function = self.get_activation_function(activation_function=output_activation_function)
-        n_layers, layer_inputs = self.get_number_layers(n_channels=n_channels, n_joints=n_joints, decrease=decrease)
+        n_layers, layer_inputs = self.get_number_layers(n_channels=n_channels, hidden_size=hidden_size, decrease=decrease)
         for layer in range(n_layers-1):
             layer_input = layer_inputs[layer]
             layer_output = layer_inputs[layer+1]

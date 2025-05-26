@@ -10,7 +10,8 @@ class CNN_Spec(nn.Module):
                  n_temporal_filters: int = 40,
                  temporal_filter_length: float = 0.5,
                  dropout: float = 0.5,
-                 combine_with_temporal: bool = True):
+                 combine_with_temporal: bool = True,
+                 hidden_size: int = 2):
         super().__init__()
 
         n_freq_samples = spec_shape[0]
@@ -19,7 +20,7 @@ class CNN_Spec(nn.Module):
         if combine_with_temporal:
             downsample_size = n_temporal_filters
         else:
-            downsample_size = 2
+            downsample_size = hidden_size
         
         temporal_filter_length = int(n_time_samples * temporal_filter_length)
         temporal_filter_length = temporal_filter_length - 1 if temporal_filter_length % 2 == 0 else temporal_filter_length
@@ -66,13 +67,14 @@ class CNN_Temp(nn.Module):
                  n_channels: int,
                  n_temporal_filters: int = 20,
                  dropout: float = 0.5,
-                 combine_with_spectrogram: bool = True):
+                 combine_with_spectrogram: bool = True,
+                 hidden_size: int = 2):
         super().__init__()
 
         if combine_with_spectrogram:
             downsample_size = n_temporal_filters
         else:
-            downsample_size = 2
+            downsample_size = hidden_size
 
         temporal_filter_length = int(n_time_samples * 0.1)
         temporal_filter_length = temporal_filter_length - 1 if temporal_filter_length % 2 == 0 else temporal_filter_length

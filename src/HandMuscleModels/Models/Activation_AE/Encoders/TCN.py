@@ -10,7 +10,8 @@ class TCN_Encoder(nn.Module):
             n_time_samples: int,
             kernel_size: int = 3,
             n_residual_blocks: int = 0,
-            dropout: float = 0.5
+            dropout: float = 0.5,
+            hidden_size: int = 2
     ):
         super().__init__()
 
@@ -31,9 +32,9 @@ class TCN_Encoder(nn.Module):
             )
 
         self.downsample = nn.Sequential(
-            nn.Conv1d(in_channels, 2,
+            nn.Conv1d(in_channels, hidden_size,
                     kernel_size=1),
-            nn.InstanceNorm1d(2, affine=True),
+            nn.InstanceNorm1d(hidden_size, affine=True),
             nn.ReLU(),
             nn.Dropout(dropout))
         

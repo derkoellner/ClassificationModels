@@ -7,15 +7,16 @@ class GRU_Decoder(nn.Module):
             n_channels: int,
             n_time_samples: int,
             hidden_size: int = 0,
+            hidden_gru_size: int = 0,
             dropout: float = 0.5):
         super().__init__()
 
         self.n_time_samples = n_time_samples
-        if hidden_size == 0:
-            hidden_size = n_channels
+        if hidden_gru_size == 0:
+            hidden_gru_size = n_channels
 
         self.upsample = nn.Sequential(
-            nn.Conv1d(2,n_channels,
+            nn.Conv1d(hidden_size,n_channels,
                       kernel_size=1),
             nn.InstanceNorm1d(n_channels, affine=True),
             nn.ReLU(),
@@ -24,14 +25,14 @@ class GRU_Decoder(nn.Module):
 
         self.gru = nn.GRU(
             input_size=n_channels,
-            hidden_size=hidden_size,
+            hidden_size=hidden_gru_size,
             num_layers=1,
             bias=True,
             batch_first=True,
             dropout=0
         )
 
-        self.reconstr = nn.Linear(hidden_size, n_channels)
+        self.reconstr = nn.Linear(hidden_gru_size, n_channels)
 
     def forward(self, x):
         x = self.upsample(x)
@@ -55,7 +56,7 @@ class CostumRNN_Decoder(nn.Module):
             self,
             n_channels: int,
             n_time_samples: int,
-            hidden_size: int = 0,
+            hidden_size: int = 2,
             dropout: float = 0.5):
         super().__init__()
 
@@ -63,7 +64,7 @@ class CostumRNN_Decoder(nn.Module):
         self.n_time_samples = n_time_samples
 
         self.upsample = nn.Sequential(
-            nn.Conv1d(2,n_channels,
+            nn.Conv1d(hidden_size,n_channels,
                       kernel_size=1),
             nn.InstanceNorm1d(n_channels, affine=True),
             nn.ReLU(),
