@@ -3,7 +3,7 @@ import torch.nn as nn
 import wandb
 
 import os
-from pathlib import Path
+# from pathlib import Path
 
 def log_model(model: nn.Module,
               model_path: str,
@@ -19,8 +19,9 @@ def log_model(model: nn.Module,
     Returns:
     None - Logs the model artifact to wandb.
     """
-    WANDB_DIR = Path(__file__).resolve().parents[2]
-    model_path = os.path.join(WANDB_DIR, model_path, f'{model_name}.pth')
+    # WANDB_DIR = Path(__file__).resolve().parents[2]
+    # model_path = os.path.join(WANDB_DIR, model_path, f'{model_name}.pth')
+    model_path = os.path.join(model_path, f'{model_name}.pth')
 
     if isinstance(model, nn.DataParallel):
         torch.save(model.module.state_dict(), model_path)
