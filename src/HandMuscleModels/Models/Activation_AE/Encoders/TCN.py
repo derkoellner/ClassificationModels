@@ -6,7 +6,7 @@ import numpy as np
 class TCN_Encoder(nn.Module):
     def __init__(
             self,
-            in_channels: int,
+            n_channels: int,
             n_time_samples: int,
             kernel_size: int = 3,
             n_residual_blocks: int = 0,
@@ -24,7 +24,7 @@ class TCN_Encoder(nn.Module):
         for i in range(n_residual_blocks):
             self.tcn.append(
                 _ResidualBlock(
-                    in_channels=in_channels,
+                    in_channels=n_channels,
                     kernel_size=kernel_size,
                     dropout=dropout,
                     dilation=2**i
@@ -32,7 +32,7 @@ class TCN_Encoder(nn.Module):
             )
 
         self.downsample = nn.Sequential(
-            nn.Conv1d(in_channels, hidden_size,
+            nn.Conv1d(n_channels, hidden_size,
                     kernel_size=1),
             nn.InstanceNorm1d(hidden_size, affine=True),
             nn.ReLU(),

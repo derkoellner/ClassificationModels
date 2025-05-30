@@ -5,7 +5,7 @@ from einops.layers.torch import Rearrange
 class CNN_Spec(nn.Module):
     def __init__(self,
                  spec_shape: tuple,
-                 t_samples: int,
+                 n_time_samples: int,
                  n_channels: int,
                  n_temporal_filters: int = 40,
                  temporal_filter_length: float = 0.5,
@@ -15,14 +15,14 @@ class CNN_Spec(nn.Module):
         super().__init__()
 
         n_freq_samples = spec_shape[0]
-        n_time_samples = spec_shape[1]
+        n_spec_time_samples = spec_shape[1]
 
         if combine_with_temporal:
             downsample_size = n_temporal_filters
         else:
             downsample_size = hidden_size
         
-        temporal_filter_length = int(n_time_samples * temporal_filter_length)
+        temporal_filter_length = int(n_spec_time_samples * temporal_filter_length)
         temporal_filter_length = temporal_filter_length - 1 if temporal_filter_length % 2 == 0 else temporal_filter_length
 
         self.temp_freq_conv = nn.Conv2d(n_channels, n_temporal_filters*n_channels,
@@ -40,7 +40,7 @@ class CNN_Spec(nn.Module):
                                 bias=False)
         self.bn = nn.BatchNorm2d(downsample_size)
 
-        self.upsample = nn.Upsample(size=t_samples, mode='linear', align_corners=True)
+        self.upsample = nn.Upsample(size=n_time_samples, mode='linear', align_corners=True)
         self.cnn = nn.Conv1d(in_channels=downsample_size, out_channels=downsample_size, kernel_size=3, padding=1)
         self.nl = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
