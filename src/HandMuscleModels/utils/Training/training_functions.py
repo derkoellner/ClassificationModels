@@ -21,7 +21,8 @@ def train_model(
                 wandb_config: dict,
                 direct_decode: bool = True,
                 project='Activation_AE',
-                accum_steps: int = 1
+                accum_steps: int = 1,
+                num_input_features: int = 1
                 ):
 
     wandb.init(

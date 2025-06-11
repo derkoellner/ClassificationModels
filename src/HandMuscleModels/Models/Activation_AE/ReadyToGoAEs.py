@@ -46,7 +46,7 @@ class Combined_CNN(nn.Module):
                 # parallel: bool = False):
         super().__init__()
 
-        self.spectral_encoder = CNN_Spec(spec_shape=spec_shape, t_samples=n_time_samples, n_channels=n_channels, n_temporal_filters=n_temporal_filters, temporal_filter_length=temporal_filter_length, dropout=dropout)
+        self.spectral_encoder = CNN_Spec(spec_shape=spec_shape, n_time_samples=n_time_samples, n_channels=n_channels, n_temporal_filters=n_temporal_filters, temporal_filter_length=temporal_filter_length, dropout=dropout)
         self.time_encoder = CNN_Temp(n_time_samples=n_time_samples, n_channels=n_channels, n_temporal_filters=n_temporal_filters, dropout=dropout)
 
         self.linear1 = nn.Linear(in_features=2*n_temporal_filters, out_features=n_temporal_filters)

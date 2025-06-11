@@ -36,6 +36,7 @@ class TCN_Encoder(nn.Module):
                     kernel_size=1),
             nn.InstanceNorm1d(hidden_size, affine=True),
             nn.ReLU(),
+            nn.Linear(in_features=n_time_samples, out_features=n_time_samples),
             nn.Dropout(dropout))
         
     def forward(self, x):

@@ -1,11 +1,13 @@
 from ..loss_fns import (
     MSELoss,
-    CorrelationLoss
+    CorrelationLoss,
+    BCELoss
 )
 
 loss_dict = dict(
     MSELoss=MSELoss,
-    CorrelationLoss=CorrelationLoss
+    CorrelationLoss=CorrelationLoss,
+    BCELoss=BCELoss
 )
 
 def get_loss_fn(loss_fn):

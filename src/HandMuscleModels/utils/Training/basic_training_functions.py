@@ -14,7 +14,8 @@ def train_test(
         device,
         direct_decode: bool = True,
         log: bool = True,
-        accum_steps: int = 1
+        accum_steps: int = 1,
+        num_input_features: int = 1
     ):
     
     for epoch in range(epochs):
@@ -29,14 +30,16 @@ def train_test(
             loss_fn,
             device,
             direct_decode,
-            accum_steps)
+            accum_steps,
+            num_input_features)
         model.eval()
         test_loss = test(
             model,
             test_data,
             device,
             loss_fn,
-            direct_decode)
+            direct_decode,
+            num_input_features)
         print(f"Train Loss: {avg_train_loss:.4f}\nTest Loss: {test_loss:>8f}")
 
         if log:
@@ -52,7 +55,8 @@ def train(
         loss_fn,
         device,
         direct_decode: bool = True,
-        accum_steps: int = 1
+        accum_steps: int = 1,
+        num_input_features: int = 1
     ):
 
     size = len(data.dataset)
@@ -69,11 +73,20 @@ def train(
             signal_hat = model(signal)
             loss = loss_fn(signal_hat, signal)
 
-        else:
+        elif num_input_features == 1:
             signal, y = batch
             signal, y = signal.to(device), y.to(device)
 
-            signal_hat = model(signal, y) # TODO remove y
+            signal_hat = model(signal)
+
+            loss = loss_fn(signal_hat, y)
+
+        elif num_input_features == 2:
+            signal, y = batch
+            signal, y = signal.to(device), y.to(device)
+
+            signal_hat = model(signal, y)
+
             loss = loss_fn(signal_hat, y)
 
         if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
@@ -104,7 +117,8 @@ def test(model,
          data: DataLoader,
          device,
          loss_fn, 
-         direct_decode: bool = True):
+         direct_decode: bool = True,
+         num_input_features: int = 1):
     num_batches = len(data)
     model.eval()
     test_loss = 0.0
@@ -121,10 +135,20 @@ def test(model,
                     loss = loss.mean()
                 test_loss += loss.item()
 
-        else:
+        elif num_input_features == 1:
             for signal, y in data:
                 signal, y = signal.to(device), y.to(device)
-                signal_hat = model(signal, y) # TODO remove y
+                signal_hat = model(signal)
+
+                loss = loss_fn(signal_hat, y)
+                if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
+                    loss = loss.mean()
+                test_loss += loss.item()
+
+        elif num_input_features == 2:
+            for signal, y in data:
+                signal, y = signal.to(device), y.to(device)
+                signal_hat = model(signal, y)
 
                 loss = loss_fn(signal_hat, y)
                 if hasattr(loss_fn, 'reduction') and loss_fn.reduction != 'mean':
