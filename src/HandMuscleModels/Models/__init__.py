@@ -8,3 +8,7 @@ from .Activation_AE.Encoders.TCN import TCN_Encoder
 # Decoder
 from .Activation_AE.Decoders.CNN import CNN_Parallel, CNN_Series
 from .Activation_AE.Decoders.RNN import CostumRNN_Decoder, GRU_Decoder
+
+# Disentanglement
+from .Disentanglement_Layer.DAE_layers import DAE_Layer
+from .Disentanglement_Layer.DAE_functions import compute_lambda
