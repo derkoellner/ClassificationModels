@@ -11,7 +11,9 @@ from ..Models import (
     CNN_Parallel,
     CNN_Series,
     CostumRNN_Decoder,
-    GRU_Decoder
+    GRU_Decoder,
+    # Regression Blocks
+    BasicRegressionBlock
 )
 
 model_dict = dict(
@@ -30,6 +32,9 @@ model_dict = dict(
     CNN_Series=CNN_Series,
     CostumRNN_Decoder=CostumRNN_Decoder,
     GRU_Decoder=GRU_Decoder,
+
+    # RegressionBlock
+    BasicRegressionBlock=BasicRegressionBlock,
 )
 
 def get_model_cls(model_name):
