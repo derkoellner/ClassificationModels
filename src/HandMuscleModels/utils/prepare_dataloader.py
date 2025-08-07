@@ -44,15 +44,43 @@ class TimeSeriesDataset(Dataset):
         trial = torch.tensor(self.data[index], dtype=torch.float)
         return trial
     
+class DatasetRegression(Dataset):
+    """
+    PyTorch dataset for time series for Regression.
+    
+    Args:
+    data: np.array - Array of time series data.
+    """
+    def __init__(self, x, y, labels):
+        self.x = x
+        self.y = y
+        self.labels = labels
+
+    def __len__(self):
+        return self.x.shape[0]
+
+    def __getitem__(self, index):
+        trial = torch.tensor(self.x[index], dtype=torch.float)
+        output = torch.tensor(self.y[index], dtype=torch.float)
+        labels = torch.tensor(self.labels[index], dtype=torch.float)
+        return trial, output, labels
+    
 def get_dataloader(input_data: np.ndarray,
+                   task: str,
                    output_data: np.ndarray = None,
                    batch_size: int = 32,
                    num_workers: int = 2) -> DataLoader:
     
-    if output_data is None:
-        dataset = TimeSeriesDataset(input_data)
-    elif output_data is not None:
-        dataset = TimeSeriesDataset_TwoFeatures(input_data, output_data)
+    if task == "Reconstruction":
+    
+        if output_data is None:
+            dataset = TimeSeriesDataset(input_data)
+        elif output_data is not None:
+            dataset = TimeSeriesDataset_TwoFeatures(input_data, output_data)
+
+    elif task == "Regression":
+
+        dataset = DatasetRegression(input_data, output_data)
 
     dataloader = DataLoader(dataset=dataset,
                             batch_size=batch_size,

@@ -6,6 +6,7 @@ from .Decoders.Stacked import StackedDecoder
 
 from .Encoders.CNN import CNN_Spec, CNN_Temp
 # from .Decoders.CNN import CNN_Parallel, CNN_Series
+from .Helper_Modules import PositiveLinear
     
 class StackedAE(nn.Module):
     def __init__(
@@ -76,3 +77,23 @@ class Combined_CNN(nn.Module):
         # x = self.decoder(x_hat)
 
         return x_hat
+
+class Simple_AE(nn.Module):
+    def __init__(self, n_channels, n_synergies):
+        super().__init__()
+
+        self.encoder = nn.Linear(in_features=n_channels, out_features=n_synergies)
+        self.nl = nn.ReLU()
+        self.decoder = PositiveLinear(in_features=n_synergies, out_features=n_channels)
+
+    def forward(self, x):
+
+        x_hat = torch.permute(x, dims=(0,2,1))
+        x_hat = self.encoder(x_hat)
+
+        z = self.nl(x_hat)
+
+        y = self.decoder(z)
+        y = torch.permute(y, dims=(0,2,1))
+
+        return y

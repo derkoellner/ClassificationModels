@@ -2,6 +2,7 @@ from ..Models import (
     # Ready to go models
     StackedAE,
     Combined_CNN,
+    Simple_AE,
     # Encoder
     CNN_Spec,
     CNN_Temp,
@@ -17,6 +18,7 @@ model_dict = dict(
     # Ready to go models
     StackedAE=StackedAE,
     Combined_CNN=Combined_CNN,
+    Simple_AE=Simple_AE,
 
     # Encoders
     CNN_Spec=CNN_Spec,

@@ -107,3 +107,13 @@ class _ResidualBlock(nn.Module):
         x_residual = self.residual_conv(x)
 
         return self.nl(x_conv + x_residual)
+    
+class PositiveLinear(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.weight_raw = nn.Parameter(torch.randn(out_features, in_features))
+        self.bias = nn.Parameter(torch.zeros(out_features))
+
+    def forward(self, x):
+        weight = F.softplus(self.weight_raw)  # or torch.exp(self.weight_raw)
+        return F.linear(x, weight, self.bias)
