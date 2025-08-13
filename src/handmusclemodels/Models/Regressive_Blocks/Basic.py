@@ -5,6 +5,7 @@ import numpy as np
 
 class BasicRegressionBlock(nn.Module):
     def __init__(self,
+                 n_time_samples: int,
                  n_hidden_dims: int,
                  n_output_channels: int,
                  n_layers: int = 4):
@@ -19,7 +20,7 @@ class BasicRegressionBlock(nn.Module):
 
         self.linear_layers = nn.Sequential()
 
-        for idx in range(output_dims-1):
+        for idx in range(len(output_dims)-1):
             self.linear_layers.append(nn.Linear(in_features=output_dims[idx], out_features=output_dims[idx+1]))
 
         self.nl = nn.ReLU()
